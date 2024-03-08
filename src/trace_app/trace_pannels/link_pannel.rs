@@ -1,42 +1,81 @@
 use eframe::egui::{ self };
 
-use super::TracePannel;
+use crate::trace_app::miti_ws::MitiTrace;
 
 pub struct LinkPannel {
-    direction: Option<String>,
+    mtrace: std::rc::Rc<MitiTrace>,
 }
 
-impl TracePannel for LinkPannel {
-    fn ui(&mut self, ctx: &egui::Context) {
-        egui::Window::new("LinkPannel").show(ctx, |ui| {
-            match &self.direction {
-                Some(a) => {
-                    ui.label(a);
+impl Default for LinkPannel {
+    fn default() -> Self {
+        Self {
+            mtrace: std::rc::Rc::new(MitiTrace::default()),
+        }
+    }
+}
+impl LinkPannel {
+    pub fn ui_control(&mut self, ui: &mut egui::Ui) {
+        ui.label("Link Control : ");
+    }
+
+    pub fn ui_content(&mut self, ui: &mut egui::Ui) {
+        let size = egui::Vec2::new(100.0, 100.0);
+        let upblack = egui::Image
+            ::new(egui::include_image!("../../../assets/uplink_black.png"))
+            .max_size(size)
+            .maintain_aspect_ratio(true);
+        let downblack = egui::Image
+            ::new(egui::include_image!("../../../assets/downlink_black.png"))
+            .max_size(size)
+            .maintain_aspect_ratio(true);
+        let downgreen = egui::Image
+            ::new(egui::include_image!("../../../assets/downlink_green.png"))
+            .max_size(size)
+            .maintain_aspect_ratio(true);
+        let upblue = egui::Image
+            ::new(egui::include_image!("../../../assets/uplink_blue.png"))
+            .max_size(size)
+            .maintain_aspect_ratio(true);
+
+        ui.vertical(|ui| {
+            match self.mtrace.direction.as_str() {
+                "upload" => {
+                    ui.add(upblue);
+                    ui.add(downblack);
                 }
-                None => {
-                    ui.label("nothing");
+                "download" => {
+                    ui.add(upblack);
+                    ui.add(downgreen);
+                }
+                _ => {
+                    ui.add(upblack);
+                    ui.add(downblack);
                 }
             }
         });
     }
 }
 
-impl Default for LinkPannel {
-    fn default() -> Self {
-        Self {
-            direction: None,
-        }
+impl super::TracePannel for LinkPannel {
+    fn name(&self) -> &'static str {
+        "Link Pannel"
+    }
+    fn show(&mut self, ctx: &egui::Context, open: &mut bool) {
+        use super::View as _;
+        egui::Window
+            ::new(self.name())
+            .open(open)
+            .show(ctx, |ui| self.ui(ui));
+    }
+    fn update_trace(&mut self, miti_trace: std::rc::Rc<MitiTrace>) {
+        self.mtrace = miti_trace;
     }
 }
 
-impl LinkPannel {
-    /* 
-    pub fn set_direction(&mut self, dir: Option<String>) {
-        self.direction = dir;
-    }*/
-    pub fn new(dir: Option<String>) -> Self {
-        Self {
-            direction: dir,
-        }
+impl super::View for LinkPannel {
+    fn ui(&mut self, ui: &mut egui::Ui) {
+        self.ui_control(ui);
+        ui.separator();
+        self.ui_content(ui);
     }
 }
