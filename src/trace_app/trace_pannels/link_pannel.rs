@@ -1,4 +1,4 @@
-use eframe::egui::{ self };
+use eframe::egui::{self};
 
 use crate::trace_app::miti_ws::MitiTrace;
 
@@ -20,37 +20,33 @@ impl LinkPannel {
 
     pub fn ui_content(&mut self, ui: &mut egui::Ui) {
         let size = egui::Vec2::new(100.0, 100.0);
-        let upblack = egui::Image
-            ::new(egui::include_image!("../../../assets/uplink_black.png"))
+        let upblack = egui::Image::new(egui::include_image!("../../../assets/uplink_black.png"))
             .max_size(size)
             .maintain_aspect_ratio(true);
-        let downblack = egui::Image
-            ::new(egui::include_image!("../../../assets/downlink_black.png"))
-            .max_size(size)
-            .maintain_aspect_ratio(true);
-        let downgreen = egui::Image
-            ::new(egui::include_image!("../../../assets/downlink_green.png"))
-            .max_size(size)
-            .maintain_aspect_ratio(true);
-        let upblue = egui::Image
-            ::new(egui::include_image!("../../../assets/uplink_blue.png"))
+        let downblack =
+            egui::Image::new(egui::include_image!("../../../assets/downlink_black.png"))
+                .max_size(size)
+                .maintain_aspect_ratio(true);
+        let downgreen =
+            egui::Image::new(egui::include_image!("../../../assets/downlink_green.png"))
+                .max_size(size)
+                .maintain_aspect_ratio(true);
+        let upblue = egui::Image::new(egui::include_image!("../../../assets/uplink_blue.png"))
             .max_size(size)
             .maintain_aspect_ratio(true);
 
-        ui.vertical(|ui| {
-            match self.mtrace.direction.as_str() {
-                "upload" => {
-                    ui.add(upblue);
-                    ui.add(downblack);
-                }
-                "download" => {
-                    ui.add(upblack);
-                    ui.add(downgreen);
-                }
-                _ => {
-                    ui.add(upblack);
-                    ui.add(downblack);
-                }
+        ui.vertical(|ui| match self.mtrace.direction.as_str() {
+            "upload" => {
+                ui.add(upblue);
+                ui.add(downblack);
+            }
+            "download" => {
+                ui.add(upblack);
+                ui.add(downgreen);
+            }
+            _ => {
+                ui.add(upblack);
+                ui.add(downblack);
             }
         });
     }
@@ -62,8 +58,7 @@ impl super::TracePannel for LinkPannel {
     }
     fn show(&mut self, ctx: &egui::Context, open: &mut bool) {
         use super::View as _;
-        egui::Window
-            ::new(self.name())
+        egui::Window::new(self.name())
             .open(open)
             .show(ctx, |ui| self.ui(ui));
     }

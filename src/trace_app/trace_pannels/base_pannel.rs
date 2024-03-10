@@ -2,48 +2,43 @@ use eframe::egui::{self};
 
 use crate::trace_app::miti_ws::MitiTrace;
 
-pub struct RatePannel {
+pub struct BasePannel {
     mtrace: std::rc::Rc<MitiTrace>,
 }
 
-impl Default for RatePannel {
+impl Default for BasePannel {
     fn default() -> Self {
         Self {
             mtrace: std::rc::Rc::new(MitiTrace::default()),
         }
     }
 }
-impl RatePannel {
+impl BasePannel {
     pub fn ui_control(&mut self, ui: &mut egui::Ui) {
-        ui.label("Rate Control");
+        ui.label("Base Pannel Control Part");
     }
 
     pub fn ui_content(&mut self, ui: &mut egui::Ui) {
-        let progress = (self.mtrace.rate as f32) / (std::u16::MAX as f32);
-        let progress_bar = egui::ProgressBar::new(progress).show_percentage();
-        ui.add(progress_bar);
+        ui.label("Base Pannel Content Part");
     }
 }
 
-impl super::TracePannel for RatePannel {
+impl super::TracePannel for BasePannel {
     fn name(&self) -> &'static str {
-        "Rate Pannel"
+        "Base Pannel"
     }
     fn show(&mut self, ctx: &egui::Context, open: &mut bool) {
         use super::View as _;
         egui::Window::new(self.name())
             .open(open)
-            .vscroll(false)
-            .resizable(false)
-            .default_size([300.0, 350.0])
-            .show(ctx, |ui: &mut egui::Ui| self.ui(ui));
+            .show(ctx, |ui| self.ui(ui));
     }
     fn update_trace(&mut self, miti_trace: std::rc::Rc<MitiTrace>) {
         self.mtrace = miti_trace;
     }
 }
 
-impl super::View for RatePannel {
+impl super::View for BasePannel {
     fn ui(&mut self, ui: &mut egui::Ui) {
         self.ui_control(ui);
         ui.separator();

@@ -11,7 +11,7 @@ fn main() -> eframe::Result<()> {
     eframe::run_native(
         "Miti's TraceFront",
         native_options,
-        Box::new(|_cc| Box::new(app))
+        Box::new(|_cc| Box::new(app)),
     )
 }
 
@@ -24,13 +24,13 @@ fn main() {
     let app = miti_tracefront::TraceFront::default();
 
     wasm_bindgen_futures::spawn_local(async {
-        eframe::WebRunner
-            ::new()
+        eframe::WebRunner::new()
             .start(
                 "the_canvas_id", // hardcode it
                 web_options,
-                Box::new(|_cc| Box::new(app))
-            ).await
+                Box::new(|_cc| Box::new(app)),
+            )
+            .await
             .expect("failed to start eframe");
     });
 }

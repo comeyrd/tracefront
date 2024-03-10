@@ -1,9 +1,9 @@
-use eframe::egui::{ self };
-mod trace_pannels;
+use eframe::egui::{self};
 mod miti_ws;
-use trace_pannels::TracePannels;
+mod trace_pannels;
 use self::miti_ws::MitiTrace;
 use self::miti_ws::MitiWs;
+use trace_pannels::TracePannels;
 
 pub struct TraceFront {
     url: String,
@@ -36,34 +36,27 @@ impl eframe::App for TraceFront {
         egui::TopBottomPanel::top("server").show(ctx, |ui| {
             ui.horizontal(|ui| {
                 ui.add(egui::TextEdit::singleline(&mut self.url));
-                if ui.button("Connect to server").clicked() {
-                    self.mitiws = MitiWs::new(self.url.clone(), ctx.clone());
-                }
                 match &mut self.mitiws {
                     Some(mws) => {
-                        match mws.is_connected() {
-                            Some(is_conn) => {
-                                if is_conn {
-                                    ui.label("✔");
-                                    ui.separator();
-                                    if ui.button("send").clicked() {
-                                        match &mut self.mitiws {
-                                            Some(conn) => { conn.send(&MitiTrace::default()) }
-                                            None => {}
-                                        }
-                                    }
-                                } else {
-                                    ui.spinner();
+                        if mws.is_connected() {
+                            ui.label("Connected");
+                            ui.separator();
+                            if ui.button("send").clicked() {
+                                match &mut self.mitiws {
+                                    Some(conn) => conn.send(&MitiTrace::default()),
+                                    None => {}
                                 }
                             }
-                            None => {
-                                self.mitiws = None;
-                                ui.label("🚫");
+                        } else {
+                            if ui.button("Connect to server").clicked() {
+                                self.mitiws = MitiWs::new(self.url.clone(), ctx.clone());
                             }
                         }
                     }
                     None => {
-                        ui.label("🚫");
+                        if ui.button("Connect to server").clicked() {
+                            self.mitiws = MitiWs::new(self.url.clone(), ctx.clone());
+                        }
                     }
                 }
             });
@@ -73,13 +66,14 @@ impl eframe::App for TraceFront {
 
         match &mut self.mitiws {
             Some(conn) => {
-                match &mut conn.try_receive() {
-                    Some(t) => {
-                        self.mtrace = std::rc::Rc::new(t.clone());
+                match conn.receive() {
+                    Some(trace) => {
+                        self.mtrace = std::rc::Rc::new(trace.clone());
+                        eprint!("{:?}", trace);
                         self.pannels.update_trace(self.mtrace.clone());
                     }
                     None => {}
-                }
+                };
             }
             None => {}
         }
