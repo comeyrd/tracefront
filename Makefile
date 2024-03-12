@@ -7,4 +7,4 @@ publish:
 	echo "Publishing on proj311.ceyraud.com";
 	trunk build;
 	scp -r ./dist always:/home/miti/proj311/;
-	echo "http://proj311.ceyraud.com";
+	echo "https://proj311.ceyraud.com";
