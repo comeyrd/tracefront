@@ -1,5 +1,7 @@
 # Tracefront
 
+This project is a Team project with [katheleligaf](https://github.com/katheleligaf), [n4n5](https://github.com/Its-Just-Nans), [SachaDico](https://github.com/SachaDico)
+
 This is a first prototype to test the capability of Rust and Egui to create an application to display LTE Traces.
 
 This project is linked to [traceserver](https://github.com/comeyrd/traceserver),
