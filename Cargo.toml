@@ -7,7 +7,7 @@ rust-version = "1.72"
 
 
 [dependencies]
-ewebsock = "*"
+ewebsock = {version="*",features = ["tls"]}
 egui_extras = { version = "*", features = ["all_loaders"] }
 image = { version = "0.24", features = ["jpeg", "png"] } # Add the types you want support for
 serde = { version = "1.0", features = ["derive"] }

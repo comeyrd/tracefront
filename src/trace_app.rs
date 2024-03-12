@@ -13,7 +13,7 @@ pub struct TraceFront {
     mtrace: std::rc::Rc<MitiTrace>,
 }
 
-const DEFAULT_URL: &str = "ws://ws.ceyraud.com:80";
+const DEFAULT_URL: &str = "wss://ws.ceyraud.com";
 impl Default for TraceFront {
     fn default() -> Self {
         Self {
