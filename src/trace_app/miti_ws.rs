@@ -1,5 +1,5 @@
-use ewebsock::{WsEvent, WsMessage, WsReceiver, WsSender};
-use serde::{Deserialize, Serialize};
+use ewebsock::{ WsEvent, WsMessage, WsReceiver, WsSender };
+use serde::{ Deserialize, Serialize };
 
 pub struct MitiWs {
     ws_sender: WsSender,
@@ -23,7 +23,7 @@ impl MitiWs {
                 };
                 return Some(mws);
             }
-            Err(error) => {
+            Err(_) => {
                 return None;
             }
         }
@@ -32,48 +32,55 @@ impl MitiWs {
     pub fn receive(&mut self) -> Option<MitiTrace> {
         let opt_event = self.ws_receiver.try_recv();
         match opt_event {
-            Some(event) => match event {
-                WsEvent::Message(msg) => match msg {
-                    WsMessage::Text(txt) => {
-                        self.error = false;
-                        let resp: MitiTrace = serde_json::from_str(&txt).unwrap();
-                        return Some(resp);
+            Some(event) =>
+                match event {
+                    WsEvent::Message(msg) =>
+                        match msg {
+                            WsMessage::Text(txt) => {
+                                self.error = false;
+                                let resp: MitiTrace = serde_json::from_str(&txt).unwrap();
+                                return Some(resp);
+                            }
+                            WsMessage::Unknown(z) => {
+                                self.error = true;
+                                self.errorstr = z.clone();
+                            }
+                            WsMessage::Binary(bin) => {
+                                self.error = true;
+                                self.errorstr = format!("{:?}", bin);
+                            }
+                            _ => {
+                                self.error = true;
+                                self.errorstr = "Received Ping-Pong".to_string();
+                            }
+                        }
+                    WsEvent::Opened => {
+                        self.connected = true;
                     }
-                    WsMessage::Unknown(z) => {
+                    WsEvent::Closed => {
+                        self.connected = false;
+                    }
+                    WsEvent::Error(str) => {
                         self.error = true;
-                        self.errorstr = z.clone();
+                        self.errorstr = str.clone();
+                        self.connected = false;
                     }
-                    WsMessage::Binary(bin) => {
-                        self.error = true;
-                        self.errorstr = format!("{:?}", bin);
-                    }
-                    _ => {
-                        self.error = true;
-                        self.errorstr = "Received Ping-Pong".to_string();
-                    }
-                },
-                WsEvent::Opened => {
-                    self.connected = true;
                 }
-                WsEvent::Closed => {
-                    self.connected = false;
-                }
-                WsEvent::Error(str) => {
-                    self.error = true;
-                    self.errorstr = str.clone();
-                    self.connected = false;
-                }
-            },
             None => {}
         }
         None
     }
     pub fn send(&mut self, msg: &MitiTrace) {
-        self.ws_sender
-            .send(WsMessage::Text(serde_json::to_string(msg).unwrap()));
+        self.ws_sender.send(WsMessage::Text(serde_json::to_string(msg).unwrap()));
     }
-    pub fn is_connected(&mut self) -> bool {
+    pub fn is_connected(&self) -> bool {
         return self.connected;
+    }
+    pub fn is_error(&self) -> bool {
+        return self.error;
+    }
+    pub fn error_str(&self) -> String {
+        return self.errorstr.clone();
     }
 }
 

@@ -1,4 +1,5 @@
-use eframe::egui::{self};
+use eframe::egui::Color32;
+use eframe::egui::{ self };
 mod miti_ws;
 mod trace_pannels;
 use self::miti_ws::MitiTrace;
@@ -36,6 +37,7 @@ impl eframe::App for TraceFront {
         egui::TopBottomPanel::top("server").show(ctx, |ui| {
             ui.horizontal(|ui| {
                 ui.add(egui::TextEdit::singleline(&mut self.url));
+
                 match &mut self.mitiws {
                     Some(mws) => {
                         if mws.is_connected() {
@@ -48,7 +50,11 @@ impl eframe::App for TraceFront {
                                 }
                             }
                         } else {
-                            if ui.button("Connect to server").clicked() {
+                            let btn = ui.button("Connect to server");
+                            if mws.is_error() {
+                                ui.colored_label(Color32::from_rgb(255, 0, 0), mws.error_str());
+                            }
+                            if btn.clicked() {
                                 self.mitiws = MitiWs::new(self.url.clone(), ctx.clone());
                             }
                         }
@@ -69,7 +75,6 @@ impl eframe::App for TraceFront {
                 match conn.receive() {
                     Some(trace) => {
                         self.mtrace = std::rc::Rc::new(trace.clone());
-                        eprint!("{:?}", trace);
                         self.pannels.update_trace(self.mtrace.clone());
                     }
                     None => {}
