@@ -1,4 +1,4 @@
-use eframe::egui::{self};
+use eframe::egui::{ self };
 
 use crate::trace_app::miti_ws::MitiTrace;
 
@@ -29,7 +29,8 @@ impl super::TracePannel for BasePannel {
     }
     fn show(&mut self, ctx: &egui::Context, open: &mut bool) {
         use super::View as _;
-        egui::Window::new(self.name())
+        egui::Window
+            ::new(self.name())
             .open(open)
             .show(ctx, |ui| self.ui(ui));
     }

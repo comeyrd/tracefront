@@ -1,12 +1,13 @@
 use std::collections::BTreeSet;
 
-use eframe::egui::{self};
+use eframe::egui::{ self };
 
 use super::miti_ws::MitiTrace;
 mod base_pannel;
 mod history_pannel;
 mod link_pannel;
 mod rate_pannel;
+//Import new pannel
 pub trait View {
     fn ui(&mut self, ui: &mut egui::Ui);
 }
@@ -25,12 +26,15 @@ pub struct TracePannels {
 
 impl Default for TracePannels {
     fn default() -> Self {
-        Self::from_pannels(vec![
-            Box::<link_pannel::LinkPannel>::default(),
-            Box::<rate_pannel::RatePannel>::default(),
-            Box::<base_pannel::BasePannel>::default(),
-            Box::<history_pannel::HistoryPannel>::default(),
-        ])
+        //How to add pannel
+        Self::from_pannels(
+            vec![
+                Box::<link_pannel::LinkPannel>::default(),
+                Box::<rate_pannel::RatePannel>::default(),
+                Box::<base_pannel::BasePannel>::default(),
+                Box::<history_pannel::HistoryPannel>::default()
+            ]
+        )
     }
 }
 
@@ -59,9 +63,12 @@ impl TracePannels {
         ui.menu_button("Pannels", |ui| {
             for pannel in &self.pannels {
                 let is_open = self.open.contains(pannel.name());
-                if ui
-                    .button((if is_open { "Close " } else { "Open " }).to_owned() + pannel.name())
-                    .clicked()
+                if
+                    ui
+                        .button(
+                            (if is_open { "Close " } else { "Open " }).to_owned() + pannel.name()
+                        )
+                        .clicked()
                 {
                     set_open(&mut self.open, pannel.name(), !is_open);
                 }
