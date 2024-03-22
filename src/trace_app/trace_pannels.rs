@@ -7,6 +7,7 @@ mod base_pannel;
 mod history_pannel;
 mod link_pannel;
 mod rate_pannel;
+mod channel_pannel;
 //Import new pannel
 pub trait View {
     fn ui(&mut self, ui: &mut egui::Ui);
@@ -32,6 +33,7 @@ impl Default for TracePannels {
                 Box::<link_pannel::LinkPannel>::default(),
                 Box::<rate_pannel::RatePannel>::default(),
                 Box::<base_pannel::BasePannel>::default(),
+                Box::<channel_pannel::ChannelPannel>::default(),
                 Box::<history_pannel::HistoryPannel>::default()
             ]
         )

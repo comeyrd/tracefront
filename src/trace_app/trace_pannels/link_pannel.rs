@@ -35,7 +35,8 @@ impl LinkPannel {
             .max_size(size)
             .maintain_aspect_ratio(true);
 
-        ui.vertical(|ui| match self.mtrace.direction.as_str() {
+        //ui.vertical(|ui| match self.mtrace.direction.as_str() {
+        ui.with_layout(egui::Layout::left_to_right(egui::Align::TOP), |ui| match self.mtrace.direction.as_str() {
             "upload" => {
                 ui.add(upblue);
                 ui.add(downblack);
@@ -58,8 +59,10 @@ impl super::TracePannel for LinkPannel {
     }
     fn show(&mut self, ctx: &egui::Context, open: &mut bool) {
         use super::View as _;
+        let size = egui::Vec2::new(215.0, 200.0);
         egui::Window::new(self.name())
             .open(open)
+            .fixed_size(size)
             .show(ctx, |ui| self.ui(ui));
     }
     fn update_trace(&mut self, miti_trace: std::rc::Rc<MitiTrace>) {
