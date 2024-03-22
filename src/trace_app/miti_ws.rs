@@ -30,43 +30,40 @@ impl MitiWs {
     }
 
     pub fn receive(&mut self) -> Option<MitiTrace> {
-        let opt_event = self.ws_receiver.try_recv();
-        match opt_event {
-            Some(event) =>
-                match event {
-                    WsEvent::Message(msg) =>
-                        match msg {
-                            WsMessage::Text(txt) => {
-                                self.error = false;
-                                let resp: MitiTrace = serde_json::from_str(&txt).unwrap();
-                                return Some(resp);
-                            }
-                            WsMessage::Unknown(z) => {
-                                self.error = true;
-                                self.errorstr = z.clone();
-                            }
-                            WsMessage::Binary(bin) => {
-                                self.error = true;
-                                self.errorstr = format!("{:?}", bin);
-                            }
-                            _ => {
-                                self.error = true;
-                                self.errorstr = "Received Ping-Pong".to_string();
-                            }
+        if let Some(event) = self.ws_receiver.try_recv() {
+            match event {
+                WsEvent::Message(msg) =>
+                    match msg {
+                        WsMessage::Text(txt) => {
+                            self.error = false;
+                            let resp: MitiTrace = serde_json::from_str(&txt).unwrap();
+                            return Some(resp);
                         }
-                    WsEvent::Opened => {
-                        self.connected = true;
+                        WsMessage::Unknown(z) => {
+                            self.error = true;
+                            self.errorstr = z.clone();
+                        }
+                        WsMessage::Binary(bin) => {
+                            self.error = true;
+                            self.errorstr = format!("{:?}", bin);
+                        }
+                        _ => {
+                            self.error = true;
+                            self.errorstr = "Received Ping-Pong".to_string();
+                        }
                     }
-                    WsEvent::Closed => {
-                        self.connected = false;
-                    }
-                    WsEvent::Error(str) => {
-                        self.error = true;
-                        self.errorstr = str.clone();
-                        self.connected = false;
-                    }
+                WsEvent::Opened => {
+                    self.connected = true;
                 }
-            None => {}
+                WsEvent::Closed => {
+                    self.connected = false;
+                }
+                WsEvent::Error(str) => {
+                    self.error = true;
+                    self.errorstr = str.clone();
+                    self.connected = false;
+                }
+            }
         }
         None
     }
